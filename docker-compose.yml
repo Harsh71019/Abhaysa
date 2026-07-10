@@ -1,0 +1,22 @@
+services:
+  mongo:
+    image: mongo:7
+    restart: unless-stopped
+    ports:
+      # Host port 27018, not 27017: this machine already has a native
+      # Homebrew mongod bound specifically to localhost:27017, which
+      # silently wins over Docker's wildcard bind and intercepts traffic
+      # meant for this container. Remote deploys are unaffected (mongo
+      # there has no published port; api reaches it over the docker
+      # network by service name).
+      - "27018:27017"
+    volumes:
+      - mongo-data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  mongo-data:

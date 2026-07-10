@@ -1,0 +1,40 @@
+services:
+  mongo:
+    image: mongo:7
+    restart: unless-stopped
+    volumes:
+      - local-mongo-data:/data/db
+    networks:
+      - local-net
+
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    restart: unless-stopped
+    env_file:
+      - apps/api/.env
+    environment:
+      MONGODB_URI: mongodb://mongo:27017/local
+    ports:
+      - "3005:3001"
+    depends_on:
+      - mongo
+    networks:
+      - local-net
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    restart: unless-stopped
+    ports:
+      - "3004:3000"
+    networks:
+      - local-net
+
+networks:
+  local-net:
+
+volumes:
+  local-mongo-data:

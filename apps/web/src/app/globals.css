@@ -1,0 +1,74 @@
+@import "tailwindcss";
+
+/* ── Raw palette (fixed values, from FRONTEND_PLAN.md §3) ─────────────── */
+:root {
+  --ink: #14171a; /* night background / day text */
+  --ink-soft: #23282e; /* night surface (cards) */
+  --paper: #f6e9b8; /* day background */
+  --paper-edge: #e8d48f; /* day borders/dividers */
+
+  --amber: #ffb300; /* indicator phosphor — primary accent, night */
+  --signal-go: #2e9e5b;
+  --signal-stop: #d64545;
+
+  --dsa: #e8833a;
+  --sysdesign: #6b5ca5;
+  --genai: #2e86ab;
+  --jsts: #c9a227;
+  --behavioral: #2e9e5b;
+}
+
+/* ── Semantic roles per theme — "Platform" (day) is the default signal ── */
+:root,
+:root[data-theme="day"] {
+  --background: var(--paper);
+  --foreground: var(--ink);
+  --surface: var(--paper);
+  --border: var(--paper-edge);
+  --accent: var(--ink);
+}
+
+:root[data-theme="night"] {
+  --background: var(--ink);
+  --foreground: var(--amber);
+  --surface: var(--ink-soft);
+  --border: var(--ink-soft);
+  --accent: var(--amber);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="day"]) {
+    --background: var(--ink);
+    --foreground: var(--amber);
+    --surface: var(--ink-soft);
+    --border: var(--ink-soft);
+    --accent: var(--amber);
+  }
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-surface: var(--surface);
+  --color-border: var(--border);
+  --color-accent: var(--accent);
+
+  --color-amber: var(--amber);
+  --color-signal-go: var(--signal-go);
+  --color-signal-stop: var(--signal-stop);
+
+  --color-dsa: var(--dsa);
+  --color-sysdesign: var(--sysdesign);
+  --color-genai: var(--genai);
+  --color-jsts: var(--jsts);
+  --color-behavioral: var(--behavioral);
+
+  --font-board: var(--font-archivo);
+  --font-reading: var(--font-literata);
+  --font-code: var(--font-jetbrains-mono);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+}
