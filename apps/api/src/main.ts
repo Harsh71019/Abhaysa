@@ -13,6 +13,10 @@ async function bootstrap(): Promise<void> {
   );
 
   await app.register(helmet);
+  // Single-user personal app (no multi-tenant auth story) — the web PWA is
+  // served from a different origin/port than the API, so allow any origin
+  // rather than hardcoding the Tailscale IP, which can change.
+  app.enableCors();
 
   const configService = app.get(ConfigService<Env, true>);
   const port = configService.get("PORT", { infer: true });

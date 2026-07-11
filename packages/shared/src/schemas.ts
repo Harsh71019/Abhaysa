@@ -31,16 +31,32 @@ export const sourceSchema = z.object({
   status: sourceStatusSchema,
   rawText: z.string().optional(),
   failureReason: z.string().optional(),
+  /** The 1:1 Deck auto-created once this Source reaches status 'extracted'. */
+  deckId: objectIdSchema.optional(),
   addedAt: z.coerce.date(),
 });
 export type Source = z.infer<typeof sourceSchema>;
 
-export const createSourceSchema = sourceSchema.pick({
-  url: true,
-  title: true,
-  kind: true,
-  pillar: true,
-});
+/** POST /sources body. Only 'article' (fetch + readability) and 'manual' (paste
+ * text directly) are ingestible today — no PDF upload yet. */
+export const createSourceKindSchema = z.enum(["article", "manual"]);
+
+export const createSourceSchema = z
+  .object({
+    title: z.string().min(1),
+    kind: createSourceKindSchema,
+    pillar: pillarSchema,
+    url: z.string().url().optional(),
+    rawText: z.string().min(1).optional(),
+  })
+  .refine((v) => v.kind !== "article" || !!v.url, {
+    message: "url is required for kind 'article'",
+    path: ["url"],
+  })
+  .refine((v) => v.kind !== "manual" || !!v.rawText, {
+    message: "rawText is required for kind 'manual'",
+    path: ["rawText"],
+  });
 export type CreateSourceInput = z.infer<typeof createSourceSchema>;
 
 // ── Card ────────────────────────────────────────────────────────────────────
@@ -179,6 +195,12 @@ export type ReviewLog = z.infer<typeof reviewLogSchema>;
 
 export const reviewBatchSchema = z.array(reviewLogSchema).min(1);
 export type ReviewBatch = z.infer<typeof reviewBatchSchema>;
+
+export const reviewBatchResponseSchema = z.object({
+  applied: z.number().int().nonnegative(),
+  skipped: z.number().int().nonnegative(),
+});
+export type ReviewBatchResponse = z.infer<typeof reviewBatchResponseSchema>;
 
 // ── Streak ──────────────────────────────────────────────────────────────────
 

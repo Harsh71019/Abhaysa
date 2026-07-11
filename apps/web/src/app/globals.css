@@ -1,48 +1,61 @@
 @import "tailwindcss";
 
-/* ── Raw palette (fixed values, from FRONTEND_PLAN.md §3) ─────────────── */
+/* ── Palette variables ── */
 :root {
-  --ink: #14171a; /* night background / day text */
-  --ink-soft: #23282e; /* night surface (cards) */
-  --paper: #f6e9b8; /* day background */
-  --paper-edge: #e8d48f; /* day borders/dividers */
+  --ink: #111215;
+  --ink-soft: #17181c;
+  --paper: #FAF9F6;
+  --paper-edge: #e4e4e7;
 
-  --amber: #ffb300; /* indicator phosphor — primary accent, night */
-  --signal-go: #2e9e5b;
-  --signal-stop: #d64545;
+  /* Accent Colors */
+  --indigo: #6366f1;
+  --indigo-dark: #4f46e5;
+  --indigo-light: #818cf8;
+  
+  --amber: #ffb300;
+  --signal-go: #10b981;
+  --signal-stop: #ef4444;
 
-  --dsa: #e8833a;
-  --sysdesign: #6b5ca5;
-  --genai: #2e86ab;
-  --jsts: #c9a227;
-  --behavioral: #2e9e5b;
+  /* Subject Pillar Hues (Premium Sleek Tones) */
+  --dsa: #ff7e47;        /* Western orange */
+  --sysdesign: #8b5cf6;  /* Purple */
+  --genai: #06b6d4;      /* Cyan */
+  --jsts: #eab308;       /* Yellow/brass */
+  --behavioral: #10b981; /* Emerald */
 }
 
-/* ── Semantic roles per theme — "Platform" (day) is the default signal ── */
+/* ── Day Theme (Aura Light) ── */
 :root,
 :root[data-theme="day"] {
-  --background: var(--paper);
+  --background: #f8f9fa;
   --foreground: var(--ink);
-  --surface: var(--paper);
-  --border: var(--paper-edge);
-  --accent: var(--ink);
+  --surface: rgba(255, 255, 255, 0.8);
+  --border: rgba(0, 0, 0, 0.06);
+  --accent: var(--indigo-dark);
+  --accent-soft: rgba(79, 70, 229, 0.08);
+  --card-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.04);
 }
 
+/* ── Night Theme (Aura Dark) ── */
 :root[data-theme="night"] {
-  --background: var(--ink);
-  --foreground: var(--amber);
-  --surface: var(--ink-soft);
-  --border: var(--ink-soft);
-  --accent: var(--amber);
+  --background: #060608;
+  --foreground: #f3f4f6;
+  --surface: rgba(13, 13, 17, 0.7);
+  --border: rgba(255, 255, 255, 0.06);
+  --accent: var(--indigo-light);
+  --accent-soft: rgba(129, 140, 248, 0.1);
+  --card-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="day"]) {
-    --background: var(--ink);
-    --foreground: var(--amber);
-    --surface: var(--ink-soft);
-    --border: var(--ink-soft);
-    --accent: var(--amber);
+    --background: #060608;
+    --foreground: #f3f4f6;
+    --surface: rgba(13, 13, 17, 0.7);
+    --border: rgba(255, 255, 255, 0.06);
+    --accent: var(--indigo-light);
+    --accent-soft: rgba(129, 140, 248, 0.1);
+    --card-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
   }
 }
 
@@ -52,6 +65,7 @@
   --color-surface: var(--surface);
   --color-border: var(--border);
   --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
 
   --color-amber: var(--amber);
   --color-signal-go: var(--signal-go);
@@ -68,7 +82,183 @@
   --font-code: var(--font-jetbrains-mono);
 }
 
+/* ── General Styles & Utilities ── */
 body {
   background: var(--background);
   color: var(--foreground);
+  transition: background-color 0.3s ease, color 0.3s ease;
+  overflow-x: hidden;
 }
+
+/* Glassmorphism style */
+.glass-card {
+  background: var(--surface);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border);
+  box-shadow: var(--card-shadow);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+}
+
+/* 3D Card Flip setup */
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+.preserve-3d {
+  transform-style: preserve-3d;
+}
+
+.backface-hidden {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.rotate-y-180 {
+  transform: rotateY(180deg);
+}
+
+/* Floating ambient background glows */
+@keyframes float-slow {
+  0% {
+    transform: translate(0px, 0px) scale(1);
+  }
+  33% {
+    transform: translate(30px, -50px) scale(1.1);
+  }
+  66% {
+    transform: translate(-20px, 20px) scale(0.95);
+  }
+  100% {
+    transform: translate(0px, 0px) scale(1);
+  }
+}
+
+@keyframes float-reverse {
+  0% {
+    transform: translate(0px, 0px) scale(1);
+  }
+  33% {
+    transform: translate(-30px, 40px) scale(0.9);
+  }
+  66% {
+    transform: translate(25px, -20px) scale(1.05);
+  }
+  100% {
+    transform: translate(0px, 0px) scale(1);
+  }
+}
+
+.animate-float-1 {
+  animation: float-slow 15s infinite ease-in-out;
+}
+
+.animate-float-2 {
+  animation: float-reverse 18s infinite ease-in-out;
+}
+
+/* Grid overlay background */
+.bg-grid-pattern {
+  background-size: 30px 30px;
+  background-image: 
+    linear-gradient(to right, var(--border) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--border) 1px, transparent 1px);
+}
+
+/* ── Scrollability Affordance Hints (Container scroll-state queries) ── */
+.scroller-container {
+  overflow-y: auto;
+  container-type: scroll-state;
+  position: relative;
+}
+
+.scroll-indicator-top,
+.scroll-indicator-bottom {
+  position: sticky;
+  left: 0;
+  right: 0;
+  height: 24px;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  pointer-events: none;
+  z-index: 10;
+  flex-shrink: 0;
+}
+
+.scroll-indicator-top {
+  top: 0;
+  background: linear-gradient(to bottom, var(--surface) 0%, transparent 100%);
+  margin-bottom: -24px;
+}
+
+.scroll-indicator-bottom {
+  bottom: 0;
+  background: linear-gradient(to top, var(--surface) 0%, transparent 100%);
+  margin-top: -24px;
+}
+
+@container scroll-state(scrollable: top) {
+  .scroll-indicator-top {
+    opacity: 1;
+  }
+}
+
+@container scroll-state(scrollable: bottom) {
+  .scroll-indicator-bottom {
+    opacity: 1;
+  }
+}
+
+/* ── Native CSS Entrance Transitions (@starting-style, Baseline 2024) ── */
+.dashboard-entrance {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.6s ease-out, transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@starting-style {
+  .dashboard-entrance {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+}
+
+.card-entrance {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  transition: opacity 0.5s ease-out, transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@starting-style {
+  .card-entrance {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+}
+
+/* Discrete toggle transition for quiz explanation details */
+.quiz-explanation {
+  display: block;
+  opacity: 1;
+  transform: translateY(0);
+  margin-top: 8px;
+  /* Separate transitions withallow-discrete to avoid breaking shorthand values */
+  transition: display 0.25s, opacity 0.25s ease-out, transform 0.25s ease-out;
+  transition-behavior: allow-discrete;
+}
+
+@starting-style {
+  .quiz-explanation {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+}
+
+.quiz-explanation[hidden] {
+  display: none;
+  opacity: 0;
+  transform: translateY(-6px);
+  margin-top: 0;
+}
+
+

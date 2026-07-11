@@ -4,7 +4,7 @@ import { Model, Types } from "mongoose";
 import type { Card, CreateCardInput } from "@local/shared";
 import { CardEntity, type CardDocument } from "./card.schema";
 
-function toCard(doc: CardDocument): Card {
+export function toCard(doc: CardDocument): Card {
   const base: Card = {
     _id: doc._id.toString(),
     deckId: doc.deckId.toString(),
