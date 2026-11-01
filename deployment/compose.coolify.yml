@@ -1,0 +1,48 @@
+# Coolify deployment (server ct102-apps). MongoDB is not managed here: the
+# existing local-mongo-1 container and its volume stay in the old "local"
+# compose project; the API reaches it as "mongo" on local_local-net.
+services:
+  api:
+    image: ghcr.io/harsh71019/local-api:${LOCAL_IMAGE_TAG}
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: "3001"
+      MONGODB_URI: mongodb://mongo:27017/local
+      AUTH_EMAIL: ${AUTH_EMAIL}
+      AUTH_PASSWORD_HASH: ${AUTH_PASSWORD_HASH}
+      JWT_SECRET: ${JWT_SECRET}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      VOYAGE_API_KEY: ${VOYAGE_API_KEY:-}
+    ports:
+      - "3105:3001"
+    mem_limit: 512m
+    logging:
+      driver: json-file
+      options: { max-size: 10m, max-file: '3' }
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3001/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - local-net
+
+  web:
+    image: ghcr.io/harsh71019/local-web:${LOCAL_IMAGE_TAG}
+    restart: unless-stopped
+    ports:
+      - "3104:3000"
+    depends_on:
+      api:
+        condition: service_healthy
+    mem_limit: 512m
+    logging:
+      driver: json-file
+      options: { max-size: 10m, max-file: '3' }
+
+networks:
+  local-net:
+    external: true
+    name: local_local-net
