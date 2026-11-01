@@ -15,7 +15,7 @@ services:
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
       VOYAGE_API_KEY: ${VOYAGE_API_KEY:-}
     ports:
-      - "3105:3001"
+      - "3005:3001"
     mem_limit: 512m
     logging:
       driver: json-file
@@ -33,7 +33,7 @@ services:
     image: ghcr.io/harsh71019/local-web:${LOCAL_IMAGE_TAG}
     restart: unless-stopped
     ports:
-      - "3104:3000"
+      - "3004:3000"
     depends_on:
       api:
         condition: service_healthy
