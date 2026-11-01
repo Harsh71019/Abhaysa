@@ -8,6 +8,9 @@ COPY apps/web/package.json apps/web/package.json
 RUN pnpm install --frozen-lockfile
 
 FROM deps AS build
+# Baked into the browser bundle at build time.
+ARG NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
 COPY packages/shared packages/shared
 COPY apps/web apps/web
 RUN pnpm --filter @local/shared build && pnpm --filter @local/web build
